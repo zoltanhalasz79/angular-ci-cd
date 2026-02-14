@@ -3,11 +3,14 @@ on:
   push:
     branches:
       - main
+
 permissions:
   contents: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v4
@@ -16,13 +19,20 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm' # Speeds up future runs by caching node_modules
 
-      - name: Install and Build 🔧
+      - name: Install Dependencies 📦
+        run: npm install
+
+      - name: Run Unit Tests 🧪
+        # Vitest is headless by default; --watch=false ensures the process exits
+        run: npx ng test --watch=false
+
+      - name: Build App 🔧
+        # This step only executes if tests pass. 
+        # Using your repo name 'angular-ci-cd' for the base-href.
         run: |
-          npm install
-          # We use your repo name for the URL
           npx ng build --configuration production --base-href /angular-ci-cd/
-          # We use 'my-github-app' because that's what your logs showed!
           cp dist/my-github-app/browser/index.html dist/my-github-app/browser/404.html
 
       - name: Deploy 🚀
