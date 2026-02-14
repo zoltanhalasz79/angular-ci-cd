@@ -2,47 +2,58 @@
   <header class="chat-header">
     <div class="header-content">
       <h1>🚀 CI/CD Firebase Chat</h1>
-      
+
       @if (chatService.user(); as user) {
-        <div class="auth-info">
-          <img [src]="user.photoURL" alt="avatar" class="avatar">
-          <span class="username">{{ user.displayName }}</span>
-          <button (click)="logout()" class="btn-logout">Logout</button>
-        </div>
+      <div class="auth-info">
+        <img [src]="user.photoURL" alt="avatar" class="avatar">
+        <span class="username">{{ user.displayName }}</span>
+        <button (click)="logout()" class="btn-logout">Logout</button>
+      </div>
       } @else {
-        <button (click)="login()" class="btn-login">Login with Google</button>
+      <button (click)="login()" class="btn-login">Login with Google</button>
       }
     </div>
   </header>
 
   <main class="message-board" #scrollContainer>
     @for (msg of chatService.messages(); track msg.id) {
-      <div class="message-row" [class.my-message-row]="msg.senderId === chatService.user()?.uid">
-        <div class="message-card" [class.my-message]="msg.senderId === chatService.user()?.uid">
+    <div class="message-row" [class.my-message-row]="msg.senderId === chatService.user()?.uid">
+      <div class="message-card" [class.my-message]="msg.senderId === chatService.user()?.uid">
+        <div class="message-meta">
           @if (msg.senderId !== chatService.user()?.uid) {
+          <div class="sender-block">
             <span class="sender-name">{{ msg.senderName }}</span>
+            <span class="sender-email">{{ msg.senderEmail || (msg.senderId === chatService.user()?.uid ?
+              chatService.user()?.email : '') }}</span>
+          </div>
+          } @else {
+          <div class="sender-block">
+            <span class="sender-name">You</span>
+            <span class="sender-email">{{ msg.senderEmail || chatService.user()?.email }}</span>
+          </div>
           }
-          <p class="message-text">{{ msg.messageText }}</p>
+          <span class="timestamp">{{ formatTimestamp(msg.timeStamp || msg.timeStamp?.toMillis?.() || msg.timeStamp)
+            }}</span>
         </div>
+        <p class="message-text">{{ msg.messageText }}</p>
       </div>
+    </div>
     } @empty {
-      <div class="empty-state">No messages yet. Be the first to post!</div>
+    <div class="empty-state">No messages yet. Be the first to post!</div>
     }
   </main>
 
   @if (chatService.user()) {
   <footer class="chat-footer">
     <div class="input-container">
-      <input #msgInput type="text" placeholder="Type your message..."
-        (input)="0" 
+      <input #msgInput type="text" placeholder="Type your message..." (input)="0"
         (keydown.enter)="msgInput.value.trim() && sendMessage(msgInput.value); msgInput.value=''">
 
-      <button (click)="sendMessage(msgInput.value); msgInput.value=''" 
-              class="btn-send"
-              [disabled]="!msgInput.value.trim() || chatService.limitReached()">
+      <button (click)="sendMessage(msgInput.value); msgInput.value=''" class="btn-send"
+        [disabled]="!msgInput.value.trim() || chatService.limitReached()">
         Send
       </button>
-    </div>  
+    </div>
     <p class="limit-status">
       Daily Limit: {{ chatService.msgCountToday() }}/100
     </p>

@@ -1,6 +1,7 @@
 import { Component, ElementRef, ViewChild, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChatService } from './chat.service';
+import { Timestamp } from 'firebase/firestore';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +13,7 @@ import { ChatService } from './chat.service';
 export class AppComponent {
   // Inject the service
   chatService = inject(ChatService);
-  
+
   // Reference the message board for scrolling
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
   // When true the next automatic scroll will be suppressed. Used after login
@@ -50,6 +51,32 @@ export class AppComponent {
 
   sendMessage(text: string) {
     this.chatService.sendMessage(text);
+  }
+
+  // Accepts Firestore Timestamp, number (ms), or ISO string and returns
+  // a readable local string like "Feb 14, 2026 14:23".
+  formatTimestamp(ts: any): string {
+    if (!ts) return '';
+    let d: Date;
+    // Firestore Timestamp
+    if (ts instanceof Timestamp) {
+      d = ts.toDate();
+    } else if (typeof ts === 'number') {
+      d = new Date(ts);
+    } else if (ts.seconds && typeof ts.seconds === 'number') {
+      // Some Firestore representations come as { seconds, nanoseconds }
+      d = new Date(ts.seconds * 1000);
+    } else {
+      d = new Date(ts);
+    }
+
+    if (isNaN(d.getTime())) return '';
+
+    // Simple format: "MMM DD, YYYY HH:mm"
+    const opts: Intl.DateTimeFormatOptions = {
+      year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit'
+    };
+    return new Intl.DateTimeFormat(undefined, opts).format(d);
   }
 
   private scrollToBottom(): void {
