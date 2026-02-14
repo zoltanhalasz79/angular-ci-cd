@@ -34,6 +34,11 @@
           }
           <span class="timestamp">{{ formatTimestamp(msg.timeStamp || msg.timeStamp?.toMillis?.() || msg.timeStamp)
             }}</span>
+          @if (msg.senderId === chatService.user()?.uid) {
+          <button class="btn-delete" (click)="deleteMessage(msg.id)" title="Delete message">
+            🗑️
+          </button>
+          }
         </div>
         <p class="message-text">{{ msg.messageText }}</p>
       </div>

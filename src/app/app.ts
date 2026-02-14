@@ -53,6 +53,13 @@ export class AppComponent {
     this.chatService.sendMessage(text);
   }
 
+  deleteMessage(messageId: string) {
+    this.chatService.deleteMessage(messageId);
+    // Scroll to top to show most recent messages after deletion
+    this.skipNextAutoScroll = true;
+    this.scrollToTop();
+  }
+
   // Accepts Firestore Timestamp, number (ms), or ISO string and returns
   // a readable local string like "Feb 14, 2026 14:23".
   formatTimestamp(ts: any): string {

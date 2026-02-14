@@ -2,7 +2,7 @@ import { Injectable, signal, computed } from '@angular/core';
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import {
     getFirestore, collection, query, orderBy, where, onSnapshot,
-    addDoc, serverTimestamp, getCountFromServer, Firestore, Timestamp
+    addDoc, serverTimestamp, getCountFromServer, Firestore, Timestamp, doc, deleteDoc
 } from 'firebase/firestore';
 import {
     getAuth, signInWithPopup, GoogleAuthProvider, signOut,
@@ -114,6 +114,14 @@ export class ChatService {
             // Fail-safe: if index is missing, assume 0 so user isn't blocked
             console.warn("Limit check failed (likely missing index). Defaulting to 0.");
             this.msgCountToday.set(0);
+        }
+    }
+
+    async deleteMessage(messageId: string) {
+        try {
+            await deleteDoc(doc(this.db, 'messages', messageId));
+        } catch (err) {
+            console.error("Delete Failed:", err);
         }
     }
 }
