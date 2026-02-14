@@ -1,12 +1,19 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common'; // Add this for [ngClass]
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {
-  protected readonly title = signal('my-github-app');
+export class AppComponent {
+  title = signal('Angular CI/CD Demo');
+  deployStatus = signal('Online');
+  lastUpdated = signal(new Date().toLocaleTimeString());
+
+  updateTime() {
+    this.lastUpdated.set(new Date().toLocaleTimeString());
+  }
 }
