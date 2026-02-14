@@ -18,28 +18,39 @@ jobs:
       - name: Setup Node 🟢
         uses: actions/setup-node@v4
         with:
-          node-version: 22 # Angular 21 runs best on Node 22
+          node-version: 22
           cache: 'npm'
 
       - name: Install Dependencies 📦
         run: npm ci --legacy-peer-deps
 
       - name: Run Unit Tests 🧪
-        # We use the standard Angular command. 
-        # --watch=false ensures it runs once and exits (required for CI).
         run: npx ng test --watch=false
 
       - name: Build App 🔧
         run: |
-          # 1. Build using your repo name as the base-href
+          # 1. Build the app
           npx ng build --configuration production --base-href /angular-ci-cd/
+
+      - name: Standardize Build Folder 📂
+        run: |
+          # 2. Create a standardized folder for deployment
+          mkdir -p dist/deployment
           
-          # 2. Fix GitHub Pages routing (404.html trick)
-          # We use 'my-github-app' because that is the project name in your angular.json
-          cp dist/my-github-app/browser/index.html dist/my-github-app/browser/404.html
+          # 3. Use shell wildcard to copy contents from the unknown folder name to our new folder
+          # This works regardless of whether it's named 'my-github-app', 'simplechat', etc.
+          cp -r dist/*/browser/* dist/deployment/
+          
+          # 4. Create the 404 workaround in the new folder
+          cp dist/deployment/index.html dist/deployment/404.html
+          
+          # Debug: List the files to prove they are there
+          echo "📂 Files ready for deployment:"
+          ls -R dist/deployment
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: dist/my-github-app/browser
           branch: gh-pages
+          # ⚠️ Now we point to the folder we manually created above
+          folder: dist/deployment
