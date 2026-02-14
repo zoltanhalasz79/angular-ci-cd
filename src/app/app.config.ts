@@ -13,7 +13,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
-    provideFirestore(() => getFirestore()),
+    provideFirestore(() => getFirestore()), // Ensure this is imported from @angular/fire/firestore
     provideAuth(() => getAuth())
   ]
 };

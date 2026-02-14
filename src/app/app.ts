@@ -1,24 +1,25 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, PLATFORM_ID } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { 
-  Firestore, 
-  collection, 
-  collectionData, 
-  query, 
-  orderBy, 
-  where, 
-  addDoc, 
-  serverTimestamp, 
-  getCountFromServer 
+import {
+  Firestore,
+  collection,
+  collectionData,
+  query,
+  orderBy,
+  where,
+  addDoc,
+  serverTimestamp,
+  getCountFromServer
 } from '@angular/fire/firestore';
-import { 
-  Auth, 
-  user, 
-  signInWithPopup, 
-  GoogleAuthProvider, 
-  signOut 
+import {
+  Auth,
+  user,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut
 } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-root',
@@ -31,7 +32,8 @@ export class AppComponent implements OnInit {
   // 1. Inject services as private readonly properties
   private readonly firestore = inject(Firestore);
   private readonly auth = inject(Auth);
-  
+  private platformId = inject(PLATFORM_ID);
+
   // 2. State management
   user$ = user(this.auth) as Observable<any>;
   messages = signal<any[]>([]);
@@ -40,8 +42,11 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     // 3. Initialize data streams inside ngOnInit to ensure stable injection context
+    if (!isPlatformBrowser(this.platformId)) {
+      console.error('no platform browser id')
+    }
     this.loadMessages();
-    
+
     this.user$.subscribe(u => {
       if (u) {
         this.checkDailyLimit(u.uid);
@@ -56,7 +61,7 @@ export class AppComponent implements OnInit {
     // Explicitly use the injected firestore instance
     const msgCollection = collection(this.firestore, 'messages');
     const q = query(msgCollection, orderBy('timestamp', 'desc'));
-    
+
     collectionData(q, { idField: 'id' }).subscribe({
       next: (data) => this.messages.set(data),
       error: (err) => console.error("Firestore Subscribe Error:", err)
