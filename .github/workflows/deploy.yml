@@ -41,6 +41,5 @@ jobs:
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
+          folder: dist/my-github-app/browser
           branch: gh-pages
-          # ⚠️ This path matches the output in your angular.json
-          folder: dist/*/browser
