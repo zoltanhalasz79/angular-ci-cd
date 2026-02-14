@@ -1,28 +1,51 @@
-<div class="container">
-  <header>
-    <h1>🚀 {{ title() }}</h1>
-    <p>Status: <span class="badge" [ngClass]="{'online': deployStatus() === 'Online'}">{{ deployStatus() }}</span></p>
-  </header>
-
-  <main class="card">
-    <h2>Deployment Successful!</h2>
-    <p>This Angular application was built and deployed automatically using <strong>GitHub Actions</strong>.</p>
+<div class="chat-container">
+  <header class="chat-header">
+    <h1>🚀 CI/CD Firebase Chat</h1>
     
-    <div class="stats">
-      <div class="stat-item">
-        <strong>Environment</strong>
-        <span>Production (GitHub Pages)</span>
-      </div>
-      <div class="stat-item">
-        <strong>Last Automation Sync</strong>
-        <span>{{ lastUpdated() }}</span>
-      </div>
+    <div *ngIf="!(user$ | async)" class="auth-section">
+      <button (click)="login()" class="btn-login">Login with Google</button>
     </div>
 
-    <button (click)="updateTime()">Refresh Local Timestamp</button>
+    <div *ngIf="user$ | async as user" class="auth-section">
+      <img [src]="user.photoURL" alt="avatar" class="avatar">
+      <span class="username">Hello, {{ user.displayName }}</span>
+      <button (click)="logout()" class="btn-logout">Logout</button>
+    </div>
+  </header>
+
+  <main class="message-board">
+    <div *ngFor="let msg of messages()" class="message-card">
+      <div class="message-header">
+        <span class="sender">{{ msg.senderName }}</span>
+        <span class="time">{{ msg.timestamp?.toDate() | date:'shortTime' }}</span>
+      </div>
+      <p class="text">{{ msg.messageText }}</p>
+    </div>
+    
+    <div *ngIf="messages().length === 0" class="empty-state">
+      No messages yet. Be the first to post!
+    </div>
   </main>
 
-  <footer>
-    <p>Built with ❤️ using Angular Signals and GitHub Actions</p>
+  <footer class="chat-footer" *ngIf="user$ | async">
+    <div class="input-wrapper">
+      <input 
+        #msgInput 
+        type="text" 
+        placeholder="Type your message..." 
+        [disabled]="limitReached()"
+        (keyup.enter)="sendMessage(msgInput.value); msgInput.value=''">
+      
+      <button 
+        (click)="sendMessage(msgInput.value); msgInput.value=''" 
+        [disabled]="limitReached() || !msgInput.value">
+        Send
+      </button>
+    </div>
+    
+    <p class="limit-note" [class.danger]="limitReached()">
+      Messages sent today: <strong>{{ msgCountToday() }}/3</strong>
+      <span *ngIf="limitReached()"> (Daily limit reached)</span>
+    </p>
   </footer>
 </div>

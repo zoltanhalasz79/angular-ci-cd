@@ -1,11 +1,11 @@
 export const environment = {
     production: true,
-    firebase: {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_https://www.google.com/search?q=PROJECT.firebaseapp.com",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_https://www.google.com/search?q=PROJECT.appspot.com",
-        messagingSenderId: "YOUR_SENDER_ID",
-        appId: "YOUR_APP_ID"
+    firebaseConfig: {
+        apiKey: "AIzaSyBzLHlVtGs8iTElQm_2p-GIAmifyrUDJsM",
+        authDomain: "simplechatgithubactions.firebaseapp.com",
+        projectId: "simplechatgithubactions",
+        storageBucket: "simplechatgithubactions.firebasestorage.app",
+        messagingSenderId: "399569683901",
+        appId: "1:399569683901:web:8b1cd0b4f7510e4d72bed4"
     }
 };
