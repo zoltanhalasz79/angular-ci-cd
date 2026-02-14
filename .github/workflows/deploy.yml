@@ -2,11 +2,9 @@ name: Build and Deploy Angular
 on:
   push:
     branches:
-      - main  # Matches your branch name
-
+      - main
 permissions:
   contents: write
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -22,13 +20,13 @@ jobs:
       - name: Install and Build 🔧
         run: |
           npm install
-          # Uses your specific repo name for the base-href
+          # We use your repo name for the URL
           npx ng build --configuration production --base-href /angular-ci-cd/
-          # Fixes routing for GitHub Pages
-          cp dist/angular-ci-cd/browser/index.html dist/angular-ci-cd/browser/404.html
+          # We use 'my-github-app' because that's what your logs showed!
+          cp dist/my-github-app/browser/index.html dist/my-github-app/browser/404.html
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: dist/angular-ci-cd/browser
+          folder: dist/my-github-app/browser
           branch: gh-pages
