@@ -19,17 +19,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm' # Speeds up future runs by caching node_modules
+          cache: 'npm'
 
       - name: Install Dependencies 📦
-        run: npm install
+        # Essential for Angular 21 + @angular/fire 19 version bridging
+        run: npm install --legacy-peer-deps
 
       - name: Run Unit Tests 🧪
         # Vitest is headless by default; --watch=false ensures the process exits
         run: npx ng test --watch=false
 
       - name: Build App 🔧
-        # This step only executes if tests pass. 
         # Using your repo name 'angular-ci-cd' for the base-href.
         run: |
           npx ng build --configuration production --base-href /angular-ci-cd/

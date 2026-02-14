@@ -1,51 +1,54 @@
 <div class="chat-container">
   <header class="chat-header">
     <h1>🚀 CI/CD Firebase Chat</h1>
-    
-    <div *ngIf="!(user$ | async)" class="auth-section">
+
+    @if (!(user$ | async)) {
+    <div class="auth-section">
       <button (click)="login()" class="btn-login">Login with Google</button>
     </div>
-
-    <div *ngIf="user$ | async as user" class="auth-section">
+    } @else {
+    @if (user$ | async; as user) {
+    <div class="auth-section">
       <img [src]="user.photoURL" alt="avatar" class="avatar">
       <span class="username">Hello, {{ user.displayName }}</span>
       <button (click)="logout()" class="btn-logout">Logout</button>
     </div>
+    }
+    }
   </header>
 
   <main class="message-board">
-    <div *ngFor="let msg of messages()" class="message-card">
+    @for (msg of messages(); track msg.id) {
+    <div class="message-card" [class.my-message]="msg.senderId === (user$ | async)?.uid">
       <div class="message-header">
         <span class="sender">{{ msg.senderName }}</span>
-        <span class="time">{{ msg.timestamp?.toDate() | date:'shortTime' }}</span>
       </div>
       <p class="text">{{ msg.messageText }}</p>
     </div>
-    
-    <div *ngIf="messages().length === 0" class="empty-state">
+    } @empty {
+    <div class="empty-state">
       No messages yet. Be the first to post!
     </div>
+    }
   </main>
 
-  <footer class="chat-footer" *ngIf="user$ | async">
+  @if (user$ | async) {
+  <footer class="chat-footer">
     <div class="input-wrapper">
-      <input 
-        #msgInput 
-        type="text" 
-        placeholder="Type your message..." 
-        [disabled]="limitReached()"
+      <input #msgInput type="text" placeholder="Type your message..." [disabled]="limitReached()"
         (keyup.enter)="sendMessage(msgInput.value); msgInput.value=''">
-      
-      <button 
-        (click)="sendMessage(msgInput.value); msgInput.value=''" 
-        [disabled]="limitReached() || !msgInput.value">
+
+      <button (click)="sendMessage(msgInput.value); msgInput.value=''" [disabled]="limitReached() || !msgInput.value">
         Send
       </button>
     </div>
-    
+
     <p class="limit-note" [class.danger]="limitReached()">
       Messages sent today: <strong>{{ msgCountToday() }}/3</strong>
-      <span *ngIf="limitReached()"> (Daily limit reached)</span>
+      @if (limitReached()) {
+      <span> (Daily limit reached)</span>
+      }
     </p>
   </footer>
+  }
 </div>
