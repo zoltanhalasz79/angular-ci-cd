@@ -35,6 +35,9 @@
           <span class="timestamp">{{ formatTimestamp(msg.timeStamp || msg.timeStamp?.toMillis?.() || msg.timeStamp)
             }}</span>
           @if (msg.senderId === chatService.user()?.uid) {
+          <button class="btn-edit" (click)="startEdit(msg.id, msg.messageText)" title="Edit message">
+            ✏️
+          </button>
           <button class="btn-delete" (click)="deleteMessage(msg.id)" title="Delete message">
             🗑️
           </button>
@@ -51,6 +54,18 @@
   @if (chatService.user()) {
   <footer class="chat-footer">
     <div class="input-container">
+      @if (editingMessageId !== null) {
+      <span class="edit-indicator">✏️ Editing...</span>
+      <input #msgInput type="text" [value]="editingMessageText" (input)="editingMessageText = $any($event.target).value"
+        (keydown.enter)="saveEdit(editingMessageText)" (keydown.escape)="cancelEdit()" placeholder="Edit message...">
+
+      <button (click)="saveEdit(editingMessageText); $event.preventDefault()" class="btn-send">
+        Save
+      </button>
+      <button (click)="cancelEdit()" class="btn-cancel">
+        Cancel
+      </button>
+      } @else {
       <input #msgInput type="text" placeholder="Type your message..." (input)="0"
         (keydown.enter)="msgInput.value.trim() && sendMessage(msgInput.value); msgInput.value=''">
 
@@ -58,6 +73,7 @@
         [disabled]="!msgInput.value.trim() || chatService.limitReached()">
         Send
       </button>
+      }
     </div>
     <p class="limit-status">
       Daily Limit: {{ chatService.msgCountToday() }}/100

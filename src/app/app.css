@@ -236,3 +236,45 @@ input:focus {
     opacity: 1;
     transform: scale(1.2);
 }
+
+/* Edit Button */
+.btn-edit {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 6px;
+    opacity: 0.6;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.btn-edit:hover {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+/* Edit Mode Indicator */
+.edit-indicator {
+    font-size: 0.85rem;
+    color: #ff9800;
+    font-weight: 600;
+    padding: 0 10px;
+}
+
+/* Cancel Button */
+.btn-cancel {
+    background-color: #888;
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-cancel:hover {
+    background-color: #666;
+    transform: translateY(-1px);
+}

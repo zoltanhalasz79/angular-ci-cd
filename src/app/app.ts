@@ -16,9 +16,15 @@ export class AppComponent {
 
   // Reference the message board for scrolling
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
+  @ViewChild('msgInput') private msgInput!: ElementRef;
+
   // When true the next automatic scroll will be suppressed. Used after login
   // so we can scroll to the most recent messages (top) instead of bottom.
   private skipNextAutoScroll = false;
+
+  // Edit mode state
+  editingMessageId: string | null = null;
+  editingMessageText: string = '';
 
   constructor() {
     // 🚀 Modern Auto-Scroll: Runs every time chatService.messages() changes
@@ -58,6 +64,43 @@ export class AppComponent {
     // Scroll to top to show most recent messages after deletion
     this.skipNextAutoScroll = true;
     this.scrollToTop();
+  }
+
+  startEdit(messageId: string, messageText: string) {
+    this.editingMessageId = messageId;
+    this.editingMessageText = messageText;
+    // Focus the input field after the view updates
+    setTimeout(() => {
+      if (this.msgInput) {
+        this.msgInput.nativeElement.focus();
+        this.msgInput.nativeElement.select();
+      }
+    }, 0);
+  }
+
+  cancelEdit() {
+    this.editingMessageId = null;
+    this.editingMessageText = '';
+    // Clear the input field
+    if (this.msgInput) {
+      this.msgInput.nativeElement.value = '';
+    }
+  }
+
+  async saveEdit(newText: string) {
+    if (!this.editingMessageId || !newText.trim()) return;
+
+    const messageId = this.editingMessageId;
+    // Clear state immediately so UI updates right away
+    this.editingMessageId = null;
+    this.editingMessageText = '';
+    // Clear the input field
+    if (this.msgInput) {
+      this.msgInput.nativeElement.value = '';
+    }
+
+    // Update in Firestore after clearing the UI
+    await this.chatService.updateMessage(messageId, newText.trim());
   }
 
   // Accepts Firestore Timestamp, number (ms), or ISO string and returns

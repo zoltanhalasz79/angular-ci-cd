@@ -2,7 +2,7 @@ import { Injectable, signal, computed } from '@angular/core';
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import {
     getFirestore, collection, query, orderBy, where, onSnapshot,
-    addDoc, serverTimestamp, getCountFromServer, Firestore, Timestamp, doc, deleteDoc
+    addDoc, serverTimestamp, getCountFromServer, Firestore, Timestamp, doc, deleteDoc, updateDoc
 } from 'firebase/firestore';
 import {
     getAuth, signInWithPopup, GoogleAuthProvider, signOut,
@@ -122,6 +122,16 @@ export class ChatService {
             await deleteDoc(doc(this.db, 'messages', messageId));
         } catch (err) {
             console.error("Delete Failed:", err);
+        }
+    }
+
+    async updateMessage(messageId: string, newText: string) {
+        try {
+            await updateDoc(doc(this.db, 'messages', messageId), {
+                messageText: newText
+            });
+        } catch (err) {
+            console.error("Update Failed:", err);
         }
     }
 }
