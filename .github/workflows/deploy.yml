@@ -27,29 +27,21 @@ jobs:
       - name: Run Unit Tests 🧪
         run: npx ng test --watch=false
 
-      - name: Build App 🔧
+      - name: Build App (Fresh Start) 🔧
         run: |
-          npx ng build --configuration production --base-href /angular-ci-cd/
+          # 1. Force a clean build to a known folder
+          npx ng build --output-path=dist/fresh-build --configuration production --base-href /angular-ci-cd/
 
-      - name: Smart Deploy Prep 🧠
-        run: |
-          # 1. Create a clean folder for deployment
-          mkdir -p dist/deployment
+          # 2. PROOF: List the files in the logs so we know they exist
+          echo "🔍 VERIFYING BUILD FILES:"
+          ls -lR dist/fresh-build
 
-          # 2. FIND the folder containing index.html (Recursive search)
-          # This command hunts down 'index.html' inside 'dist' and gets its parent folder
-          BUILD_FOLDER=$(find dist -type f -name index.html | head -n 1 | xargs dirname)
-          
-          echo "✅ Found build artifact at: $BUILD_FOLDER"
-          
-          # 3. Copy contents from that discovered folder to our deploy folder
-          cp -r $BUILD_FOLDER/* dist/deployment/
-          
-          # 4. Create the 404 hack
-          cp dist/deployment/index.html dist/deployment/404.html
+          # 3. Create the 404 hack
+          cp dist/fresh-build/browser/index.html dist/fresh-build/browser/404.html
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
-          folder: dist/deployment
+          folder: dist/fresh-build/browser
+          force: true  # ⚠️ This ensures we overwrite any history conflicts
