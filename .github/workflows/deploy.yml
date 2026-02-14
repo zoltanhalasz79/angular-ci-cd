@@ -29,28 +29,27 @@ jobs:
 
       - name: Build App 🔧
         run: |
-          # 1. Build the app
           npx ng build --configuration production --base-href /angular-ci-cd/
 
-      - name: Standardize Build Folder 📂
+      - name: Smart Deploy Prep 🧠
         run: |
-          # 2. Create a standardized folder for deployment
+          # 1. Create a clean folder for deployment
           mkdir -p dist/deployment
+
+          # 2. FIND the folder containing index.html (Recursive search)
+          # This command hunts down 'index.html' inside 'dist' and gets its parent folder
+          BUILD_FOLDER=$(find dist -type f -name index.html | head -n 1 | xargs dirname)
           
-          # 3. Use shell wildcard to copy contents from the unknown folder name to our new folder
-          # This works regardless of whether it's named 'my-github-app', 'simplechat', etc.
-          cp -r dist/*/browser/* dist/deployment/
+          echo "✅ Found build artifact at: $BUILD_FOLDER"
           
-          # 4. Create the 404 workaround in the new folder
+          # 3. Copy contents from that discovered folder to our deploy folder
+          cp -r $BUILD_FOLDER/* dist/deployment/
+          
+          # 4. Create the 404 hack
           cp dist/deployment/index.html dist/deployment/404.html
-          
-          # Debug: List the files to prove they are there
-          echo "📂 Files ready for deployment:"
-          ls -R dist/deployment
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
-          # ⚠️ Now we point to the folder we manually created above
           folder: dist/deployment
