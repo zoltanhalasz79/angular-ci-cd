@@ -18,25 +18,29 @@ jobs:
       - name: Setup Node 🟢
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22 # Angular 21 runs best on Node 22
           cache: 'npm'
 
       - name: Install Dependencies 📦
-        # Essential for Angular 21 + @angular/fire 19 version bridging
-        run: npm install --legacy-peer-deps
+        run: npm ci --legacy-peer-deps
 
       - name: Run Unit Tests 🧪
-        # Vitest is headless by default; --watch=false ensures the process exits
+        # We use the standard Angular command. 
+        # --watch=false ensures it runs once and exits (required for CI).
         run: npx ng test --watch=false
 
       - name: Build App 🔧
-        # Using your repo name 'angular-ci-cd' for the base-href.
         run: |
+          # 1. Build using your repo name as the base-href
           npx ng build --configuration production --base-href /angular-ci-cd/
+          
+          # 2. Fix GitHub Pages routing (404.html trick)
+          # We use 'my-github-app' because that is the project name in your angular.json
           cp dist/my-github-app/browser/index.html dist/my-github-app/browser/404.html
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: dist/my-github-app/browser
           branch: gh-pages
+          # ⚠️ This path matches the output in your angular.json
+          folder: dist/my-github-app/browser
