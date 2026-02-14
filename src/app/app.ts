@@ -1,25 +1,6 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { 
-  Firestore, 
-  collection, 
-  collectionData, 
-  query, 
-  orderBy, 
-  where, 
-  addDoc, 
-  serverTimestamp, 
-  getCountFromServer,
-  firestoreInstance$ // Add this import
-} from '@angular/fire/firestore';
-import { 
-  Auth, 
-  user, 
-  signInWithPopup, 
-  GoogleAuthProvider, 
-  signOut 
-} from '@angular/fire/auth';
-import { switchMap, take } from 'rxjs/operators';
+import { ChatService } from './chat.service';
 
 @Component({
   selector: 'app-root',
@@ -28,74 +9,40 @@ import { switchMap, take } from 'rxjs/operators';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class AppComponent implements OnInit {
-  private readonly auth = inject(Auth);
+export class AppComponent {
+  // Inject the service
+  chatService = inject(ChatService);
   
-  user$ = user(this.auth);
-  messages = signal<any[]>([]);
-  msgCountToday = signal(0);
-  limitReached = signal(false);
+  // Reference the message board for scrolling
+  @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
-  ngOnInit() {
-    // This approach ensures we ONLY query once the firestore instance is fully "ready"
-    firestoreInstance$.pipe(
-      switchMap(instance => {
-        const msgCollection = collection(instance, 'messages');
-        const q = query(msgCollection, orderBy('timestamp', 'desc'));
-        return collectionData(q, { idField: 'id' });
-      })
-    ).subscribe({
-      next: (data) => this.messages.set(data),
-      error: (err) => console.error("Final Firestore Error:", err)
-    });
-
-    this.user$.subscribe(u => {
-      if (u) this.checkDailyLimit(u.uid);
+  constructor() {
+    // 🚀 Modern Auto-Scroll: Runs every time chatService.messages() changes
+    effect(() => {
+      // We just access the signal to register the dependency
+      const _ = this.chatService.messages();
+      
+      // Schedule scroll after view updates
+      setTimeout(() => this.scrollToBottom(), 100);
     });
   }
 
-  async sendMessage(text: string) {
-    if (this.limitReached() || !text.trim()) return;
+  login() {
+    this.chatService.login();
+  }
 
-    // Get the instance explicitly for the write operation
-    const instance = await firestoreInstance$.pipe(take(1)).toPromise();
-    const currentUser = this.auth.currentUser;
+  logout() {
+    this.chatService.logout();
+  }
 
-    if (instance && currentUser) {
-      await addDoc(collection(instance, 'messages'), {
-        messageText: text,
-        senderId: currentUser.uid,
-        senderName: currentUser.displayName,
-        timestamp: serverTimestamp()
-      });
-      this.checkDailyLimit(currentUser.uid);
+  sendMessage(text: string) {
+    this.chatService.sendMessage(text);
+  }
+
+  private scrollToBottom(): void {
+    if (this.scrollContainer) {
+      const el = this.scrollContainer.nativeElement;
+      el.scrollTop = el.scrollHeight;
     }
-  }
-
-  async checkDailyLimit(userId: string) {
-    const instance = await firestoreInstance$.pipe(take(1)).toPromise();
-    if (!instance) return;
-
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
-
-    const q = query(
-      collection(instance, 'messages'),
-      where('senderId', '==', userId),
-      where('timestamp', '>=', startOfToday)
-    );
-
-    const snapshot = await getCountFromServer(q);
-    const count = snapshot.data().count;
-    this.msgCountToday.set(count);
-    this.limitReached.set(count >= 3);
-  }
-
-  async login() {
-    await signInWithPopup(this.auth, new GoogleAuthProvider());
-  }
-
-  async logout() {
-    await signOut(this.auth);
   }
 }

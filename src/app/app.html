@@ -1,53 +1,50 @@
 <div class="chat-container">
   <header class="chat-header">
-    <h1>🚀 CI/CD Firebase Chat</h1>
-
-    @if (!(user$ | async)) {
-    <div class="auth-section">
-      <button (click)="login()" class="btn-login">Login with Google</button>
+    <div class="header-content">
+      <h1>🚀 CI/CD Firebase Chat</h1>
+      
+      @if (chatService.user(); as user) {
+        <div class="auth-info">
+          <img [src]="user.photoURL" alt="avatar" class="avatar">
+          <span class="username">{{ user.displayName }}</span>
+          <button (click)="logout()" class="btn-logout">Logout</button>
+        </div>
+      } @else {
+        <button (click)="login()" class="btn-login">Login with Google</button>
+      }
     </div>
-    } @else {
-    @if (user$ | async; as user) {
-    <div class="auth-section">
-      <img [src]="user.photoURL" alt="avatar" class="avatar">
-      <span class="username">Hello, {{ user.displayName }}</span>
-      <button (click)="logout()" class="btn-logout">Logout</button>
-    </div>
-    }
-    }
   </header>
 
-  <main class="message-board">
-    @for (msg of messages(); track msg.id) {
-    <div class="message-card" [class.my-message]="msg.senderId === (user$ | async)?.uid">
-      <div class="message-header">
-        <span class="sender">{{ msg.senderName }}</span>
+  <main class="message-board" #scrollContainer>
+    @for (msg of chatService.messages(); track msg.id) {
+      <div class="message-row" [class.my-message-row]="msg.senderId === chatService.user()?.uid">
+        <div class="message-card" [class.my-message]="msg.senderId === chatService.user()?.uid">
+          @if (msg.senderId !== chatService.user()?.uid) {
+            <span class="sender-name">{{ msg.senderName }}</span>
+          }
+          <p class="message-text">{{ msg.messageText }}</p>
+        </div>
       </div>
-      <p class="text">{{ msg.messageText }}</p>
-    </div>
     } @empty {
-    <div class="empty-state">
-      No messages yet. Be the first to post!
-    </div>
+      <div class="empty-state">No messages yet. Be the first to post!</div>
     }
   </main>
 
-  @if (user$ | async) {
+  @if (chatService.user()) {
   <footer class="chat-footer">
-    <div class="input-wrapper">
-      <input #msgInput type="text" placeholder="Type your message..." [disabled]="limitReached()"
-        (keyup.enter)="sendMessage(msgInput.value); msgInput.value=''">
+    <div class="input-container">
+      <input #msgInput type="text" placeholder="Type your message..."
+        (input)="0" 
+        (keydown.enter)="msgInput.value.trim() && sendMessage(msgInput.value); msgInput.value=''">
 
-      <button (click)="sendMessage(msgInput.value); msgInput.value=''" [disabled]="limitReached() || !msgInput.value">
+      <button (click)="sendMessage(msgInput.value); msgInput.value=''" 
+              class="btn-send"
+              [disabled]="!msgInput.value.trim() || chatService.limitReached()">
         Send
       </button>
-    </div>
-
-    <p class="limit-note" [class.danger]="limitReached()">
-      Messages sent today: <strong>{{ msgCountToday() }}/3</strong>
-      @if (limitReached()) {
-      <span> (Daily limit reached)</span>
-      }
+    </div>  
+    <p class="limit-status">
+      Daily Limit: {{ chatService.msgCountToday() }}/100
     </p>
   </footer>
   }
