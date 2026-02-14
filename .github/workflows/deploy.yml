@@ -43,4 +43,4 @@ jobs:
         with:
           branch: gh-pages
           # ⚠️ This path matches the output in your angular.json
-          folder: dist/my-github-app/browser
+          folder: dist/*/browser
