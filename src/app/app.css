@@ -1,24 +1,37 @@
+/* Dark Theme Chat App */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background: #0a0e27;
+    color: #e0e0e0;
+}
+
 /* Container & Layout */
 .chat-container {
     max-width: 600px;
     margin: 20px auto;
     height: 90vh;
-    /* Takes up most of the screen height */
     display: flex;
     flex-direction: column;
-    background: #ffffff;
+    background: #1a1f3a;
     border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     overflow: hidden;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    border: 1px solid #2a3050;
 }
 
 /* Header Section */
 .chat-header {
-    background: #007bff;
+    background: linear-gradient(90deg, #2563eb, #1e40af);
     color: white;
     padding: 15px 20px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid #1a3070;
 }
 
 .header-content {
@@ -76,9 +89,9 @@
     display: flex;
     flex-direction: column;
     gap: 14px;
-    background-color: #f0f2f5;
+    background-color: #0f1228;
     scrollbar-width: thin;
-    scrollbar-color: #ccc transparent;
+    scrollbar-color: #3a4560 transparent;
 }
 
 /* Message Alignment Logic */
@@ -100,13 +113,13 @@
     padding: 10px 14px;
     border-radius: 18px;
     position: relative;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-    background: white;
-    color: #333;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    background: #252d47;
+    color: #e0e0e0;
 }
 
 .my-message {
-    background: #b2c5da !important;
+    background: linear-gradient(135deg, #2563eb, #1e40af) !important;
     color: white !important;
     border-bottom-right-radius: 4px;
     /* Sharp corner for "tail" effect */
@@ -120,7 +133,7 @@
     display: block;
     font-size: 0.75rem;
     font-weight: 700;
-    color: #007bff;
+    color: #60a5fa;
     margin-bottom: 3px;
 }
 
@@ -138,14 +151,14 @@
 
 .timestamp {
     font-size: 0.7rem;
-    color: #4e2e2e;
+    color: #a0aac0;
     font-weight: 500;
 }
 
 .sender-email {
     display: block;
     font-size: 0.7rem;
-    color: #581515;
+    color: #9099a8;
     font-weight: 500;
 }
 
@@ -158,8 +171,8 @@
 /* Footer & Input Area */
 .chat-footer {
     padding: 15px 20px;
-    background: white;
-    border-top: 1px solid #eee;
+    background: #1a1f3a;
+    border-top: 1px solid #2a3050;
 }
 
 .input-container {
@@ -171,19 +184,26 @@
 input {
     flex: 1;
     padding: 12px 18px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid #3a4560;
     border-radius: 25px;
     outline: none;
     font-size: 0.95rem;
     transition: border-color 0.2s;
+    background: #252d47;
+    color: #e0e0e0;
+}
+
+input::placeholder {
+    color: #7a8598;
 }
 
 input:focus {
-    border-color: #007bff;
+    border-color: #2563eb;
+    box-shadow: 0 0 8px rgba(37, 99, 235, 0.3);
 }
 
 .btn-send {
-    background-color: #007bff;
+    background: linear-gradient(90deg, #2563eb, #1e40af);
     color: white;
     border: none;
     padding: 10px 22px;
@@ -194,13 +214,13 @@ input:focus {
 }
 
 .btn-send:hover:not(:disabled) {
-    background-color: #0056b3;
+    background: linear-gradient(90deg, #1e40af, #1a368a);
     transform: translateY(-1px);
 }
 
 .btn-send:disabled {
-    background-color: #e0e0e0 !important;
-    color: #a0a0a0;
+    background: #3a4560 !important;
+    color: #7a8598;
     cursor: not-allowed;
     transform: none;
 }
@@ -210,12 +230,12 @@ input:focus {
     font-size: 0.75rem;
     text-align: center;
     margin-top: 10px;
-    color: #888;
+    color: #7a8598;
 }
 
 .empty-state {
     text-align: center;
-    color: #999;
+    color: #7a8598;
     margin-top: 50px;
     font-style: italic;
 }
@@ -257,14 +277,14 @@ input:focus {
 /* Edit Mode Indicator */
 .edit-indicator {
     font-size: 0.85rem;
-    color: #ff9800;
+    color: #fbbf24;
     font-weight: 600;
     padding: 0 10px;
 }
 
 /* Cancel Button */
 .btn-cancel {
-    background-color: #888;
+    background-color: #dc2626;
     color: white;
     border: none;
     padding: 10px 22px;
@@ -275,6 +295,6 @@ input:focus {
 }
 
 .btn-cancel:hover {
-    background-color: #666;
+    background-color: #b91c1c;
     transform: translateY(-1px);
 }
