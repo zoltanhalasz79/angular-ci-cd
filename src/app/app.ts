@@ -26,6 +26,19 @@ export class AppComponent {
   editingMessageId: string | null = null;
   editingMessageText: string = '';
 
+  // Color palette for users (in light and dark mode)
+  private userColors = new Map<string, { dark: string; light: string }>();
+  private colorPalette = [
+    { dark: '#2563eb', light: '#0066cc' },  // Blue
+    { dark: '#dc2626', light: '#cc0000' },  // Red
+    { dark: '#059669', light: '#008000' },  // Green
+    { dark: '#d97706', light: '#ff8c00' },  // Orange
+    { dark: '#7c3aed', light: '#6600cc' },  // Purple
+    { dark: '#0891b2', light: '#0088aa' },  // Cyan
+    { dark: '#db2777', light: '#cc0066' },  // Pink
+    { dark: '#ea580c', light: '#ff6600' },  // Orange-Red
+  ];
+
   constructor() {
     // 🚀 Modern Auto-Scroll: Runs every time chatService.messages() changes
     effect(() => {
@@ -141,5 +154,34 @@ export class AppComponent {
       const el = this.scrollContainer.nativeElement;
       el.scrollTop = 0;
     }
+  }
+
+  // Get consistent color for a user based on their ID
+  getUserColor(userId: string): string {
+    if (!this.userColors.has(userId)) {
+      // Generate a hash from the user ID to determine which color to use
+      let hash = 0;
+      for (let i = 0; i < userId.length; i++) {
+        hash = ((hash << 5) - hash) + userId.charCodeAt(i);
+        hash |= 0; // Convert to 32-bit integer
+      }
+      const colorIndex = Math.abs(hash) % this.colorPalette.length;
+      this.userColors.set(userId, this.colorPalette[colorIndex]);
+    }
+    return this.userColors.get(userId)?.dark || '#2563eb';
+  }
+
+  // Get light mode color for a user
+  getUserColorLight(userId: string): string {
+    if (!this.userColors.has(userId)) {
+      let hash = 0;
+      for (let i = 0; i < userId.length; i++) {
+        hash = ((hash << 5) - hash) + userId.charCodeAt(i);
+        hash |= 0;
+      }
+      const colorIndex = Math.abs(hash) % this.colorPalette.length;
+      this.userColors.set(userId, this.colorPalette[colorIndex]);
+    }
+    return this.userColors.get(userId)?.light || '#0066cc';
   }
 }

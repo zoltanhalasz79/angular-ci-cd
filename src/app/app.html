@@ -18,11 +18,13 @@
   <main class="message-board" #scrollContainer>
     @for (msg of chatService.messages(); track msg.id) {
     <div class="message-row" [class.my-message-row]="msg.senderId === chatService.user()?.uid">
-      <div class="message-card" [class.my-message]="msg.senderId === chatService.user()?.uid">
+      <div class="message-card" 
+           [class.my-message]="msg.senderId === chatService.user()?.uid"
+           [style.background]="msg.senderId === chatService.user()?.uid ? 'linear-gradient(135deg, ' + getUserColor(msg.senderId) + ', ' + getUserColor(msg.senderId).replace('#', '#0') + ')' : ''">
         <div class="message-meta">
           @if (msg.senderId !== chatService.user()?.uid) {
           <div class="sender-block">
-            <span class="sender-name">{{ msg.senderName }}</span>
+            <span class="sender-name" [style.color]="getUserColor(msg.senderId)">{{ msg.senderName }}</span>
             <span class="sender-email">{{ msg.senderEmail || (msg.senderId === chatService.user()?.uid ?
               chatService.user()?.email : '') }}</span>
           </div>
